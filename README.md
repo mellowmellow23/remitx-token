@@ -13,6 +13,13 @@ RemitX Token (RMX) is an EIP-20 compliant reward token designed to solve this vi
 * **`ERC20Permit`**: An extension providing EIP-2612 capabilities for off-chain, signature-based allowance modifications.
 * **`Ownable`**: An access control module ensuring only the platform's trusted transfer agent can mint new rewards.
 
+### Security & Testing Architecture
+This contract was built with a test-driven approach using **Foundry**, ensuring institutional-grade security before deployment. The test suite includes 18 exhaustive tests covering core mechanics, edge cases, and exploit attempts.
+
+* **Property-Based Fuzzing:** Utilized Foundry's fuzzer to throw thousands of randomized inputs at the contract, proving that the 50M `MAX_SUPPLY` cap and partial-burn mathematics hold under any valid numerical combination.
+* **EIP-2612 Exploit Prevention:** Explicitly tested against signature replay attacks. Proved that once a gasless permit is consumed, a stale nonce strictly returns an `ERC2612InvalidSigner` error, preventing bad actors from draining allowances.
+* **Defensive Edge Cases:** Validated that the contract safely reverts on zero-address mints, zero-amount transfers, and explicitly blocks accidental ownership renouncement to prevent bricking the mint function.
+
 ### EIP References
 * [EIP-20: Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 * [EIP-2612: Permit Extension for ERC-20 Signed Approvals](https://eips.ethereum.org/EIPS/eip-2612)
