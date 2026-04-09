@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.33;
 
-/// @title RemitX Token (RMX)
+/// @title Remit Token (RMX)
 /// @author Julius Macharia
 /// @notice ERC-20 reward token for the RemitX cross-border remittance platform.
 /// @dev Inherits ERC20, ERC20Burnable, ERC20Permit, and Ownable from OpenZeppelin v5.
