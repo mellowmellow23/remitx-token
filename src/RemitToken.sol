@@ -20,7 +20,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 
 contract RemitToken is ERC20, ERC20Burnable, ERC20Permit, Ownable {
-
     // -------------------------------------------------------------------------
     // Custom errors
     // -------------------------------------------------------------------------
@@ -77,11 +76,7 @@ contract RemitToken is ERC20, ERC20Burnable, ERC20Permit, Ownable {
     ///         - ERC20Permit: sets the EIP-712 domain name for permit() signatures
     ///         - Ownable: sets the initial owner who can call onlyOwner functions
     ///         ERC20Burnable has no constructor arguments.
-    constructor(address initialOwner)
-        ERC20("RemitX Token", "RMX")
-        ERC20Permit("RemitX Token")
-        Ownable(initialOwner)
-    {}
+    constructor(address initialOwner) ERC20("RemitX Token", "RMX") ERC20Permit("RemitX Token") Ownable(initialOwner) {}
 
     // -------------------------------------------------------------------------
     // Owner functions

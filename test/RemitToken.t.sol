@@ -63,7 +63,6 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract RemitTokenTest is Test {
-
     RemitToken public token;
 
     address public owner;
@@ -131,12 +130,7 @@ contract RemitTokenTest is Test {
     ///         when a non-owner calls an onlyOwner function.
     function test_NonOwnerCannotMint() public {
         vm.prank(user);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                Ownable.OwnableUnauthorizedAccount.selector,
-                user
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
         token.mint(user, 1000 * 10 ** 18);
     }
 
@@ -210,12 +204,7 @@ contract RemitTokenTest is Test {
 
         vm.prank(user);
         vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC20Errors.ERC20InsufficientBalance.selector,
-                user,
-                100 * 10 ** 18,
-                200 * 10 ** 18
-            )
+            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, user, 100 * 10 ** 18, 200 * 10 ** 18)
         );
         token.redeemForDiscount(200 * 10 ** 18);
     }
@@ -247,12 +236,7 @@ contract RemitTokenTest is Test {
 
         // Old owner should now be blocked
         vm.prank(owner);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                Ownable.OwnableUnauthorizedAccount.selector,
-                owner
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, owner));
         token.mint(user, 1000 * 10 ** 18);
 
         // New owner should be able to mint
@@ -280,9 +264,7 @@ contract RemitTokenTest is Test {
 
         bytes32 structHash = keccak256(
             abi.encode(
-                keccak256(
-                    "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-                ),
+                keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"),
                 owner,
                 spender,
                 amount,
@@ -291,9 +273,7 @@ contract RemitTokenTest is Test {
             )
         );
 
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), structHash)
-        );
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), structHash));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPrivateKey, digest);
         token.permit(owner, spender, amount, deadline, v, r, s);
@@ -316,9 +296,7 @@ contract RemitTokenTest is Test {
 
         bytes32 structHash = keccak256(
             abi.encode(
-                keccak256(
-                    "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-                ),
+                keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"),
                 owner,
                 spender,
                 amount,
@@ -327,9 +305,7 @@ contract RemitTokenTest is Test {
             )
         );
 
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), structHash)
-        );
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), structHash));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPrivateKey, digest);
 
@@ -341,12 +317,7 @@ contract RemitTokenTest is Test {
         // ERC2612ExpiredSignature lives on ERC20Permit, not IERC20Errors.
         // We match the full selector + argument because the deadline value
         // is known and predictable here.
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                ERC20Permit.ERC2612ExpiredSignature.selector,
-                deadline
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(ERC20Permit.ERC2612ExpiredSignature.selector, deadline));
         token.permit(owner, spender, amount, deadline, v, r, s);
     }
 
@@ -386,9 +357,7 @@ contract RemitTokenTest is Test {
             )
         );
 
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), structHash)
-        );
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), structHash));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPrivateKey, digest);
 
@@ -397,7 +366,7 @@ contract RemitTokenTest is Test {
         assertEq(token.nonces(owner), nonceBefore + 1);
 
         // --- THE FIX ---
-        // Dynamically calculate the garbage address the contract will recover 
+        // Dynamically calculate the garbage address the contract will recover
         // when it hashes the payload using the new, incremented nonce.
         bytes32 staleStructHash = keccak256(
             abi.encode(
@@ -409,22 +378,14 @@ contract RemitTokenTest is Test {
                 deadline
             )
         );
-        
-        bytes32 staleDigest = keccak256(
-            abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), staleStructHash)
-        );
-        
+
+        bytes32 staleDigest = keccak256(abi.encodePacked("\x19\x01", token.DOMAIN_SEPARATOR(), staleStructHash));
+
         // ecrecover with the stale digest but original V, R, S yields the garbage address
         address recoveredSigner = ecrecover(staleDigest, v, r, s);
 
         // Now we can strictly match the exact 68-byte custom error OpenZeppelin expects
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                ERC20Permit.ERC2612InvalidSigner.selector,
-                recoveredSigner,
-                owner
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(ERC20Permit.ERC2612InvalidSigner.selector, recoveredSigner, owner));
         token.permit(owner, spender, amount, deadline, v, r, s);
     }
 
@@ -476,10 +437,7 @@ contract RemitTokenTest is Test {
     ///         balance for any combination of mint and burn amounts.
     /// @dev    This catches any integer underflow or balance accounting errors
     ///         that fixed unit test values might miss.
-    function testFuzz_PartialBurnLeavesCorrectBalance(
-        uint256 mintAmount,
-        uint256 burnAmount
-    ) public {
+    function testFuzz_PartialBurnLeavesCorrectBalance(uint256 mintAmount, uint256 burnAmount) public {
         vm.assume(mintAmount > 0);
         vm.assume(mintAmount <= token.MAX_SUPPLY());
         vm.assume(burnAmount > 0);
@@ -498,10 +456,7 @@ contract RemitTokenTest is Test {
     /// @notice Proves minting to ANY valid address works correctly —
     ///         not just the hardcoded `user` address in unit tests.
     /// @dev    Filters out address(0) which is a separate revert case.
-    function testFuzz_MintToAnyValidAddress(
-        address recipient,
-        uint256 amount
-    ) public {
+    function testFuzz_MintToAnyValidAddress(address recipient, uint256 amount) public {
         vm.assume(recipient != address(0));
         vm.assume(amount > 0);
         vm.assume(amount <= token.MAX_SUPPLY());
