@@ -24,6 +24,11 @@ This contract was built with a test-driven approach using **Foundry**, ensuring 
 * [EIP-20: Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 * [EIP-2612: Permit Extension for ERC-20 Signed Approvals](https://eips.ethereum.org/EIPS/eip-2612)
 
+### Live Deployment
+* **Network:** Sepolia Testnet
+* **Contract Address:** `0x04704a2d38378Cc084AF2604d7211C531b71163b`
+* **Verified Contract:** [View on Etherscan](https://sepolia.etherscan.io/address/0x04704a2d38378Cc084AF2604d7211C531b71163b)
+
 ### How to Run Locally
 
 1. Install dependencies:
